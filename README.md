@@ -13,10 +13,9 @@
 
 This browser extension can automatically save the posts you meet in the timeline (Up to 100 tweets).
 
-这个浏览器插件可以帮你自动记录 X 时间线中出现的推文。
+这个浏览器插件可以帮你自动记录 X 时间线中出现的推文，并允许你搜索或者收藏它们。
 
-https://github.com/RiverTwilight/Timeline/assets/52880665/544b798e-6aa9-4ab8-852e-c3ef393044af
-
+https://github.com/RiverTwilight/Timeline/assets/52880665/57179574-3c24-48ea-b21d-44cdf3ce444a
 
 ## Contribution
 
