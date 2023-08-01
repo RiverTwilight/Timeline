@@ -11,11 +11,12 @@
 
 </div>
 
-This browser extension can automatically save the Tweet you meet in the timeline (Up to 100 tweets).
+This browser extension can automatically save the posts you meet in the timeline (Up to 100 tweets).
 
 这个浏览器插件可以帮你自动记录 X 时间线中出现的推文。
 
-![Demo](./assets/demo.mov)
+https://github.com/RiverTwilight/Timeline/assets/52880665/544b798e-6aa9-4ab8-852e-c3ef393044af
+
 
 ## Contribution
 
