@@ -1,6 +1,6 @@
 {
 	"name": "timeline",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "🎞️ Save the timeline browse history of your X (Twitter).",
 	"main": "background.js",
 	"type": "module",
@@ -15,7 +15,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"htm": "^3.1.1",
-		"preact": "^10.11.3",
+		"preact": "^10.16.0",
 		"preact-router": "^4.1.0",
 		"react": "npm:@preact/compat",
 		"react-dom": "npm:@preact/compat",

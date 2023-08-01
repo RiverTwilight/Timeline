@@ -3,7 +3,6 @@ import commonjs from "@rollup/plugin-commonjs";
 // import typescript from "@rollup/plugin-typescript";
 import { babel } from "@rollup/plugin-babel";
 import alias from "@rollup/plugin-alias";
-import banner from "rollup-plugin-banner";
 
 const extensions = [".js", ".jsx", ".ts", ".tsx"];
 
@@ -62,6 +61,18 @@ export default [
 		output: [
 			{
 				file: "tampermonkey/bundle.js",
+				format: "cjs",
+				sourcemap: false,
+			},
+		],
+		preserveSymlinks: true,
+		plugins: [...plugins],
+	},
+	{
+		input: "src/components/options.jsx",
+		output: [
+			{
+				file: "dist/options.bundle.cjs.js",
 				format: "cjs",
 				sourcemap: false,
 			},
