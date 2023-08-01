@@ -1,0 +1,38 @@
+{
+	"name": "timeline",
+	"version": "1.0.0",
+	"description": "🎞️ Save the timeline browse history of your X (Twitter).",
+	"main": "background.js",
+	"type": "module",
+	"scripts": {
+		"predev": "node ./src/utils/init.js",
+		"dev": "rollup -c -w",
+		"build": "rollup -c",
+		"build:content": "rollup ./src/components/content.js --file ./dist/content.bundle.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"htm": "^3.1.1",
+		"preact": "^10.11.3",
+		"preact-router": "^4.1.0",
+		"react": "npm:@preact/compat",
+		"react-dom": "npm:@preact/compat",
+		"react-router-dom": "^6.9.0",
+		"rollup-plugin-banner": "^0.2.1"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.20.12",
+		"@babel/plugin-transform-react-jsx": "^7.20.7",
+		"@rollup/plugin-alias": "^4.0.2",
+		"@rollup/plugin-babel": "^6.0.3",
+		"@rollup/plugin-commonjs": "^24.0.0",
+		"@rollup/plugin-node-resolve": "^15.0.1",
+		"@rollup/plugin-typescript": "^11.0.0",
+		"atomizer": "^3.24.2",
+		"concurrently": "^7.6.0",
+		"rollup": "^3.10.0",
+		"typescript": "^4.9.4"
+	}
+}
