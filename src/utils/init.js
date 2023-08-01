@@ -21,7 +21,7 @@ const rawConfig = {
 	background: {
 		service_worker: "background.js",
 	},
-	browser_action: {
+	action: {
 		default_icon: {
 			16: "./icon/android-icon-36x36.png",
 			48: "./icon/android-icon-48x48.png",

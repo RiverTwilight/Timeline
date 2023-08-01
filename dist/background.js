@@ -1,4 +1,4 @@
-chrome.browserAction.onClicked.addListener(function () {
-	alert('working?');
+chrome.action.onClicked.addListener((tab) => {
 	chrome.runtime.openOptionsPage();
+	// console.log(123)
 });
