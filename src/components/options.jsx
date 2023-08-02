@@ -110,34 +110,9 @@ function clearTweets() {
 	});
 }
 
-// navLinks.forEach(function (link) {
-// 	link.addEventListener("click", function (event) {
-// 		event.preventDefault();
-
-// 		navLinks.forEach(function (innerLink) {
-// 			innerLink.classList.remove("active");
-// 		});
-
-// 		this.classList.add("active");
-
-// 		var id = this.getAttribute("href").substring(1);
-
-// 		var sections = document.querySelectorAll("main > section");
-// 		sections.forEach(function (section) {
-// 			section.style.display = "none";
-// 		});
-
-// 		var sectionToShow = document.getElementById(id);
-// 		if (sectionToShow) {
-// 			sectionToShow.style.display = "block";
-// 		}
-// 	});
-// });
-
 function formatDate(isoString) {
 	const date = new Date(isoString);
 
-	// You can adjust the format as you like
 	const year = date.getFullYear();
 	const month = ("0" + (date.getMonth() + 1)).slice(-2); // months are zero-indexed in JS
 	const day = ("0" + date.getDate()).slice(-2);
@@ -147,9 +122,20 @@ function formatDate(isoString) {
 	return `${month}/${day}/${year} ${hour}:${minute}`;
 }
 
-function Header() {
+function exportTweets(tweets) {
+	const json = JSON.stringify(tweets);
+	const blob = new Blob([json], { type: "application/json" });
+	const href = URL.createObjectURL(blob);
+	const link = document.createElement("a");
+	link.href = href;
+	link.download = "tweets.json";
+	link.click();
+	URL.revokeObjectURL(href); // free up storage--no longer needed.
+}
+
+function Header({ tweets }) {
 	return (
-		<header class="z-10 backdrop-blur pr-[70px] py-1 sticky left-0 right-0 top-0">
+		<header class="z-10 backdrop-blur pr-[75px] py-1 sticky left-0 right-0 top-0">
 			<div class="container mx-auto flex justify-between items-center">
 				<h1 class="font-bold text-xl flex items-center gap-2">
 					<img
@@ -160,8 +146,14 @@ function Header() {
 				</h1>
 				<div>
 					<a
+						onClick={() => exportTweets(tweets)}
+						class="text-gray-500 cursor-pointer hover:text-black"
+					>
+						Export
+					</a>
+					<a
 						href="https://github.com/RiverTwilight/Timeline"
-						class="ml-2 text-gray-500"
+						class="text-gray-500 ml-4 cursor-pointer hover:text-black"
 					>
 						Github
 					</a>
@@ -223,7 +215,7 @@ function App() {
 
 	return (
 		<div class="relative min-w-[500px] max-w-[800px]">
-			<Header />
+			<Header tweets={tweet} />
 			<div class="relative container mx-auto flex">
 				<aside class="w-48 sticky pt-5 h-screen px-4 left-0 bottom-0 top-[74px] overflow-hidden">
 					<nav>

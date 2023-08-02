@@ -77,8 +77,7 @@ function saveTweet(userName, tweetBody, userId, tweetUrl, tweetTime, tweetImages
 // }
 
 function main() {
-  const pathName = window.location.pathname;
-  if (pathName == "/home") {
+  {
     let lastScrollTop = 0;
     window.addEventListener("scroll", function () {
       let scrollTop = window.pageYOffset || document.documentElement.scrollTop;

@@ -1,4 +1,5 @@
 const _maxSaveNumber = 100;
+const _onlyWorkOnHome = false;
 
 function addMenu(tweetEle) {
 	let dropdownElem = tweetEle.querySelector("[data-testid=Dropdown]");
@@ -119,7 +120,7 @@ function saveTweet(
 function main() {
 	const pathName = window.location.pathname;
 
-	if (pathName == "/home") {
+	if ((_onlyWorkOnHome && pathName == "/home") || !_onlyWorkOnHome) {
 		let lastScrollTop = 0;
 		window.addEventListener("scroll", function () {
 			let scrollTop =
