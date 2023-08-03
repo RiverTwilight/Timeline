@@ -1,3 +1,3 @@
-import main from "./components/content"
+import main from "./utils/content"
 
 main();

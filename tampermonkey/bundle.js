@@ -1,6 +1,8 @@
 'use strict';
 
 const _maxSaveNumber = 100;
+// const _primaryContainer = document.querySelector("[data-testid=primaryColumn]");
+
 function addMenu(tweetEle) {
   let dropdownElem = tweetEle.querySelector("[data-testid=Dropdown]");
   if (dropdownElem) {

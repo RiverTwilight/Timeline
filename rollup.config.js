@@ -57,19 +57,7 @@ export default [
 		plugins: plugins,
 	},
 	{
-		input: "src/index.tampermonkey.js",
-		output: [
-			{
-				file: "tampermonkey/bundle.js",
-				format: "cjs",
-				sourcemap: false,
-			},
-		],
-		preserveSymlinks: true,
-		plugins: [...plugins],
-	},
-	{
-		input: "src/components/options.jsx",
+		input: "src/pages/options/index.jsx",
 		output: [
 			{
 				file: "dist/options.bundle.cjs.js",

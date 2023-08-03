@@ -8,13 +8,15 @@ function Tweet({
   tweet
 }) {
   return y("div", {
-    class: `my-4 rounded-xl shadow relative group/item flex overflow-hidden ${tweet.bookmarked ? "is-bookmarked" : ""}`
-  }, y("a", {
+    class: `${tweet.engaged ? "border-blue-400 border-2 group is-engaged" : ""} my-4 rounded-xl shadow relative group/item flex overflow-hidden ${tweet.bookmarked ? "is-bookmarked" : ""}`
+  }, y("span", {
+    className: "bg-blue-400 hidden group-[.is-engaged]:block h-5 text-white px-2 absolute rounded-sm right-0 bottom-0"
+  }, "Engaged"), y("a", {
     target: "_blank",
     class: "w-full",
     href: tweet.tweetUrl
   }, y("div", {
-    class: "bg-white hover:bg-gray-100 cursor-pointer p-4 transition-all group-hover/item:translate-x-[-40px]"
+    class: "bg-white hover:bg-gray-100 cursor-pointer p-4 transition-all group-hover/item:translate-x-[-80px]"
   }, y("div", {
     class: "flex justify-between"
   }, y("span", {
@@ -29,10 +31,12 @@ function Tweet({
     class: "rounded-lg object-cover h-32 w-32",
     src: img
   }))))), y("div", {
-    class: "bg-yellow-300 cursor-pointer transition-all w-[40px] flex flex-col justify-center items-center absolute top-0 bottom-0 right-[-40px] group-hover/item:right-0"
+    class: "cursor-pointer transition-all w-[80px] flex justify-center items-center absolute top-0 bottom-0 right-[-80px] group-hover/item:right-0"
   }, y("button", {
     onclick: () => toggleBookmark(tweet.tweetUrl),
-    class: "h-full"
+    class: "h-full flex-1 flex flex-col justify-center bg-yellow-400 hover:bg-yellow-500"
+  }, y("div", {
+    className: "flex justify-center w-full"
   }, y("svg", {
     xmlns: "http://www.w3.org/2000/svg",
     height: "24",
@@ -48,8 +52,23 @@ function Tweet({
     viewBox: "0 -960 960 960",
     width: "24"
   }, y("path", {
+    fill: "#ffffff",
     d: "M850-695H610v-60h240v60ZM480-240 200-120v-725h350v60H260v574l220-93 220 93v-334h60v425L480-240ZM260-785h290-290Z"
-  })))));
+  })))), y("button", {
+    onclick: () => deleteTweet(tweet.tweetUrl),
+    class: "h-full flex-1 flex flex-col justify-center bg-red-400 hover:bg-red-500"
+  }, y("div", {
+    className: "flex justify-center w-full"
+  }, y("svg", {
+    xmlns: "http://www.w3.org/2000/svg",
+    height: "24",
+    viewBox: "0 -960 960 960",
+    width: "24",
+    class: "group-hover:ml-3"
+  }, y("path", {
+    fill: "#ffffff",
+    d: "M261-120q-24.75 0-42.375-17.625T201-180v-570h-11q-12.75 0-21.375-8.675-8.625-8.676-8.625-21.5 0-12.825 8.625-21.325T190-810h158q0-13 8.625-21.5T378-840h204q12.75 0 21.375 8.625T612-810h158q12.75 0 21.375 8.675 8.625 8.676 8.625 21.5 0 12.825-8.625 21.325T770-750h-11v570q0 24.75-17.625 42.375T699-120H261Zm438-630H261v570h438v-570Zm-438 0v570-570Zm219 330 96 97q10 10 24 10.5t24-10q10-10.5 10-24T624-370l-96-98 96-98q10-10 10-23.5T624-613q-10-10-24-10t-24 10l-96 97-95-97q-10-10-24-10t-24 10q-10 10-10 24t10 24l96 97-96 97q-10 10-10 24t10 24q10 10 24 10t24-10l95-97Z"
+  }))))));
 }
 function toggleBookmark(tweetUrl) {
   return new Promise((resolve, reject) => {
@@ -59,6 +78,34 @@ function toggleBookmark(tweetUrl) {
       for (let tweet of tweets) {
         if (tweet.tweetUrl === tweetUrl) {
           tweet.bookmarked = !tweet.bookmarked; // Toggle the bookmark status
+          updated = true;
+          break;
+        }
+      }
+      if (updated) {
+        chrome.storage.local.set({
+          tweets: tweets
+        }, () => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve();
+          }
+        });
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+function deleteTweet(tweetUrl) {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get("tweets", function (data) {
+      let tweets = data.tweets || [];
+      let updated = false;
+      for (let tweetIndex in tweets) {
+        if (tweetUrl === tweets[tweetIndex].tweetUrl) {
+          tweets.splice(tweetIndex, 1);
           updated = true;
           break;
         }
@@ -179,8 +226,6 @@ function App() {
     };
 
     chrome.storage.onChanged.addListener(handleStorageChange);
-
-    // Cleanup: remove event listener
     return () => chrome.storage.onChanged.removeListener(handleStorageChange);
   }, []);
   return y("div", {
@@ -190,7 +235,7 @@ function App() {
   }), y("div", {
     class: "relative container mx-auto flex"
   }, y("aside", {
-    class: "w-48 sticky pt-5 h-screen px-4 left-0 bottom-0 top-[74px] overflow-hidden"
+    class: "w-48 sticky pt-5 h-[90vh] px-4 left-0 bottom-0 top-[74px] overflow-hidden"
   }, y("nav", null, y("a", {
     onClick: () => setActiveTab("History"),
     class: `${activeTab == "History" ? "active" : ""} text-lg text-gray-600 cursor-pointer font-semibold block mb-2 py-2 px-4 rounded-md hover:bg-gray-200`
@@ -206,18 +251,19 @@ function App() {
       tweet: t
     });
   }), y("p", {
-    className: "text-gray-500"
-  }, "Total: ", tweet.length, "/100")), searchTerm.length > 0 && y("section", null, searchResults.filter(t => {
+    className: "text-gray-500 py-2"
+  }, "Total: ", tweet.length, "/100"), y("p", {
+    className: "text-gray-500 py-2"
+  }, "Chrome has a limit of local storage used by extension. The oldest tweet will automatically replaced by newly added if the limit is reached.")), searchTerm.length > 0 && y("section", null, searchResults.filter(t => {
     return t.bookmarked && activeTab == "Favorite" || activeTab != "Favorite";
   }).map(t => {
     return y(Tweet, {
       tweet: t
     });
   })), y("section", {
-    id: "result",
     style: "display: none"
   })), y("div", {
-    class: "w-48 sticky h-screen flex flex-col right-0 bottom-0 top-[74px] mt-3 overflow-visible"
+    class: "w-48 sticky h-[90vh] flex flex-col right-0 bottom-0 top-[74px] mt-3 overflow-visible"
   }, y("div", {
     class: "group w-full flex items-center relative"
   }, y("button", {
@@ -272,7 +318,7 @@ function App() {
     class: "group-hover:ml-3"
   }, y("path", {
     fill: "rgb(239, 68, 68)",
-    d: "M261-120q-24.75 0-42.375-17.625T201-180v-570h-11q-12.75 0-21.375-8.675-8.625-8.676-8.625-21.5 0-12.825 8.625-21.325T190-810h158q0-13 8.625-21.5T378-840h204q12.75 0 21.375 8.625T612-810h158q12.75 0 21.375 8.675 8.625 8.676 8.625 21.5 0 12.825-8.625 21.325T770-750h-11v570q0 24.75-17.625 42.375T699-120H261Zm438-630H261v570h438v-570Zm-438 0v570-570Zm219 330 96 97q10 10 24 10.5t24-10q10-10.5 10-24T624-370l-96-98 96-98q10-10 10-23.5T624-613q-10-10-24-10t-24 10l-96 97-95-97q-10-10-24-10t-24 10q-10 10-10 24t10 24l96 97-96 97q-10 10-10 24t10 24q10 10 24 10t24-10l95-97Z"
+    d: "M600-230v-60h145v60H600Zm0-368v-60h280v60H600Zm0 184v-60h235v60H600ZM125-675H80v-60h170v-45h135v45h170v60h-45v415q0 24-18 42t-42 18H185q-24 0-42-18t-18-42v-415Zm60 0v415h265v-415H185Zm0 0v415-415Z"
   }))), y("span", {
     class: "text-red-500 cursor-pointer translate-y-[4px] absolute left-12 opacity-0 group-hover:opacity-100"
   }, "Clear")))));
