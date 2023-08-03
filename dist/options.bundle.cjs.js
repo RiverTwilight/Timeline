@@ -10,7 +10,7 @@ function Tweet({
   return y("div", {
     class: `${tweet.engaged ? "border-blue-400 border-2 group is-engaged" : ""} my-4 rounded-xl shadow relative group/item flex overflow-hidden ${tweet.bookmarked ? "is-bookmarked" : ""}`
   }, y("span", {
-    className: "bg-blue-400 hidden group-[.is-engaged]:block h-5 text-white px-2 absolute rounded-sm right-0 bottom-0"
+    className: "bg-blue-400 hidden group-[.is-engaged]:block h-5 text-white px-2 absolute rounded-sm rounded-b-none right-0 bottom-0"
   }, "Engaged"), y("a", {
     target: "_blank",
     class: "w-full",

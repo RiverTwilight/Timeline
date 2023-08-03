@@ -10,7 +10,7 @@ function Tweet({ tweet }) {
 				tweet.bookmarked ? "is-bookmarked" : ""
 			}`}
 		>
-			<span className="bg-blue-400 hidden group-[.is-engaged]:block h-5 text-white px-2 absolute rounded-sm right-0 bottom-0">
+			<span className="bg-blue-400 hidden group-[.is-engaged]:block h-5 text-white px-2 absolute rounded-sm rounded-b-none right-0 bottom-0">
 				Engaged
 			</span>
 			<a target="_blank" class="w-full" href={tweet.tweetUrl}>

@@ -3,7 +3,7 @@ import fs from "fs";
 const rawConfig = {
 	name: "Timeline - X History",
 	manifest_version: 3,
-	version: "1.1",
+	version: "1.2",
 	icons: {
 		16: "./icon/android-icon-36x36.png",
 		48: "./icon/android-icon-48x48.png",
