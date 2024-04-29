@@ -38,13 +38,13 @@ Install the dependencies
 yarn install
 ```
 
-Run the dev mode to build the extension
+Run the dev mode to build the extension. The files of unpacked extension are in `dist` folder.
 
 ```
 yarn run dev
 ```
 
-The you can load the unpacked extension from `dist` in the extension setting page.
+Enable the `dev mode` in the extension setting page. Then you can load the unpacked extension from `dist`.
 
 ## License
 
