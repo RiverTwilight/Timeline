@@ -32,6 +32,14 @@ https://github.com/RiverTwilight/Timeline/assets/52880665/57179574-3c24-48ea-b21
 
 ## Contribution
 
+Install the dependencies
+
+```
+yarn install
+```
+
+Run the dev mode to build the extension
+
 ```
 yarn run dev
 ```
