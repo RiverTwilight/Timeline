@@ -78,7 +78,7 @@ function main() {
   {
     let lastScrollTop = 0;
     window.addEventListener("scroll", function () {
-      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      let scrollTop = window.scrollY || document.documentElement.scrollTop;
       if (Math.abs(scrollTop - lastScrollTop) > 300) {
         lastScrollTop = scrollTop;
         processTweets();
