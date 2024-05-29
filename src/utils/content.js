@@ -84,13 +84,16 @@ function processTweets() {
 
 function isElementInViewport(el) {
 	const rect = el.getBoundingClientRect();
+	const rectHeight = rect.bottom - rect.top;
+
 	return (
-		rect.top >= 0 &&
-		rect.left >= 0 &&
-		rect.bottom <=
-			(window.innerHeight || document.documentElement.clientHeight) &&
-		rect.right <=
-			(window.innerWidth || document.documentElement.clientWidth)
+		rectHeight > document.documentElement.clientHeight ||
+		(rect.top >= 0 &&
+			rect.left >= 0 &&
+			rect.bottom <=
+				(window.innerHeight || document.documentElement.clientHeight) &&
+			rect.right <=
+				(window.innerWidth || document.documentElement.clientWidth))
 	);
 }
 
@@ -193,31 +196,9 @@ function main() {
 						mutation.type === "childList" &&
 						window.location.href !== currentUrl
 					) {
-						console.log("=====>", currentUrl);
 						currentUrl = window.location.href;
 
 						processTweets();
-
-						// let tweetID = currentUrl.split("/").pop();
-
-						// chrome.storage.local.get("tweets", function (data) {
-						// 	let tweets = data.tweets || [];
-
-						// 	// Find the relevant tweet in the storage by its ID
-						// 	let tweetIndex = tweets.findIndex((tweet) =>
-						// 		tweet.tweetUrl.includes(tweetID)
-						// 	);
-
-						// 	if (tweetIndex !== -1) {
-						// 		// Update the 'engaged' attribute of the tweet
-						// 		tweets[tweetIndex].engaged = true;
-
-						// 		// Save the updated tweets array back to the storage
-						// 		chrome.storage.local.set({ tweets: tweets });
-						// 	} else {
-						// 		processTweets();
-						// 	}
-						// });
 					}
 				}
 			};
