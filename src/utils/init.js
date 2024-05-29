@@ -3,7 +3,7 @@ import fs from "fs";
 const rawConfig = {
 	name: "Timeline - Your X (Twitter) History",
 	manifest_version: 3,
-	version: "1.2",
+	version: "1.3",
 	icons: {
 		16: "./icon/android-icon-36x36.png",
 		48: "./icon/android-icon-48x48.png",
@@ -30,7 +30,7 @@ const rawConfig = {
 	},
 };
 
-const MATCHES = ["*://*.twitter.com/*"];
+const MATCHES = ["*://*.twitter.com/*", "*://*.x.com/*"];
 
 rawConfig["content_scripts"].forEach((script) => {
 	script.matches = MATCHES;
