@@ -10,7 +10,7 @@ function Tweet({
   return y("div", {
     class: `${tweet.engaged ? "border-blue-400 border-2 group is-engaged" : ""} my-4 rounded-xl shadow relative group/item flex overflow-hidden ${tweet.bookmarked ? "is-bookmarked" : ""}`
   }, y("span", {
-    className: "bg-blue-400 hidden group-[.is-engaged]:block h-5 text-white px-2 absolute rounded-sm rounded-b-none right-0 bottom-0"
+    className: "bg-blue-400 hidden group-[.is-engaged]:block h-5 text-white px-2 absolute rounded-tl-sm rounded-b-none right-0 bottom-0"
   }, "Engaged"), y("a", {
     target: "_blank",
     class: "w-full",
@@ -185,7 +185,7 @@ function Header({
   }, "Export"), y("a", {
     href: "https://github.com/RiverTwilight/Timeline",
     class: "text-gray-500 ml-4 cursor-pointer hover:text-black"
-  }, "Github"))));
+  }, "GitHub"))));
 }
 function App() {
   const [tweet, setTweet] = h([]);
@@ -250,11 +250,42 @@ function App() {
     return y(Tweet, {
       tweet: t
     });
-  }), y("p", {
+  }), !!!tweet.length && y("div", {
+    class: "bg-white p-4 rounded-xl flex flex-col justify-center h-56"
+  }, y("p", {
+    class: "text-gray-700 mt-1 w-full font-bold text-xl text-center"
+  }, "No Record Yet"), y("p", {
+    class: "text-gray-700 w-full text-base text-center"
+  }, "Take a look at x.com and check back later")), y("p", {
     className: "text-gray-500 py-2"
   }, "Total: ", tweet.length, "/100"), y("p", {
     className: "text-gray-500 py-2"
-  }, "Chrome has a limit of local storage used by extension. The oldest tweet will automatically replaced by newly added if the limit is reached.")), searchTerm.length > 0 && y("section", null, searchResults.filter(t => {
+  }, "Chrome has a limit of local storage used by extension. The oldest tweet will automatically replaced by newly added if the limit is reached."), y("div", {
+    className: "mt-8 flex flex-col justify-center items-center"
+  }, y("div", {
+    className: "border-slate-400 rounded-full"
+  }, y("img", {
+    height: 56,
+    width: 56,
+    src: chrome.runtime.getURL("icon/ygeeker.png")
+  })), y("span", {
+    className: "mt-2 text-sm text-slate-400"
+  }, "A Work From"), y("div", {
+    className: "text-lg"
+  }, y("a", {
+    href: "https://www.ygeeker.com"
+  }, "YGeeker")), y("div", {
+    className: "flex mt-2 mb-4 text-slate-500 space-x-1"
+  }, y("a", {
+    href: "https://www.ygeeker.com/support/timeline/intro",
+    className: "px-2 hover:underline"
+  }, "Help"), y("span", null, "\xB7"), y("a", {
+    href: "https://www.ygeeker.com/support/timeline/legal/term-of-use",
+    className: "px-2 hover:underline"
+  }, "Terms"), y("span", null, "\xB7"), y("a", {
+    href: "https://www.ygeeker.com/support/timeline/intro",
+    className: "px-2 hover:underline"
+  }, "Feedback")))), searchTerm.length > 0 && y("section", null, searchResults.filter(t => {
     return t.bookmarked && activeTab == "Favorite" || activeTab != "Favorite";
   }).map(t => {
     return y(Tweet, {

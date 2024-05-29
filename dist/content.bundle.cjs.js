@@ -16,6 +16,8 @@ const _root = "https://x.com";
 // 	}
 // }
 
+// Pure photo tweet example: https://x.com/firefox/status/1795542811804340402
+
 function processTweets() {
   let tweets = document.querySelectorAll("[data-testid=cellInnerDiv]");
   tweets.forEach(tweet => {
@@ -43,7 +45,7 @@ function processTweets() {
           tweetUrl = _root + tweetUrlElem.getAttribute("href");
         }
         let userName = userNameElem.textContent;
-        let tweetBody = tweetBodyElem.textContent;
+        let tweetBody = tweetBodyElem ? tweetBodyElem.textContent : "";
         if (!!showMoreLink) {
           tweetBody = tweetBody.slice(0, -9);
         }

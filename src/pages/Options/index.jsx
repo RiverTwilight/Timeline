@@ -10,7 +10,7 @@ function Tweet({ tweet }) {
 				tweet.bookmarked ? "is-bookmarked" : ""
 			}`}
 		>
-			<span className="bg-blue-400 hidden group-[.is-engaged]:block h-5 text-white px-2 absolute rounded-sm rounded-b-none right-0 bottom-0">
+			<span className="bg-blue-400 hidden group-[.is-engaged]:block h-5 text-white px-2 absolute rounded-tl-sm rounded-b-none right-0 bottom-0">
 				Engaged
 			</span>
 			<a target="_blank" class="w-full" href={tweet.tweetUrl}>
@@ -212,7 +212,7 @@ function Header({ tweets }) {
 						href="https://github.com/RiverTwilight/Timeline"
 						class="text-gray-500 ml-4 cursor-pointer hover:text-black"
 					>
-						Github
+						GitHub
 					</a>
 				</div>
 			</div>
@@ -315,6 +315,16 @@ function App() {
 								.map((t) => {
 									return <Tweet tweet={t} />;
 								})}
+							{!!!tweet.length && (
+								<div class="bg-white p-4 rounded-xl flex flex-col justify-center h-56">
+									<p class="text-gray-700 mt-1 w-full font-bold text-xl text-center">
+										No Record Yet
+									</p>
+									<p class="text-gray-700 w-full text-base text-center">
+										Take a look at x.com and check back later
+									</p>
+								</div>
+							)}
 							<p className="text-gray-500 py-2">
 								Total: {tweet.length}/100
 							</p>
@@ -323,6 +333,47 @@ function App() {
 								extension. The oldest tweet will automatically
 								replaced by newly added if the limit is reached.
 							</p>
+							<div className="mt-8 flex flex-col justify-center items-center">
+								<div className="border-slate-400 rounded-full">
+									<img
+										height={56}
+										width={56}
+										src={chrome.runtime.getURL(
+											"icon/ygeeker.png"
+										)}
+									></img>
+								</div>
+								<span className="mt-2 text-sm text-slate-400">
+									A Work From
+								</span>
+								<div className="text-lg">
+									<a href="https://www.ygeeker.com">
+										YGeeker
+									</a>
+								</div>
+								<div className="flex mt-2 mb-4 text-slate-500 space-x-1">
+									<a
+										href="https://www.ygeeker.com/support/timeline/intro"
+										className="px-2 hover:underline"
+									>
+										Help
+									</a>
+									<span>·</span>
+									<a
+										href="https://www.ygeeker.com/support/timeline/legal/term-of-use"
+										className="px-2 hover:underline"
+									>
+										Terms
+									</a>
+									<span>·</span>
+									<a
+										href="https://www.ygeeker.com/support/timeline/intro"
+										className="px-2 hover:underline"
+									>
+										Feedback
+									</a>
+								</div>
+							</div>
 						</section>
 					)}
 					{searchTerm.length > 0 && (

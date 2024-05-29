@@ -22,6 +22,12 @@ const rawConfig = {
 	background: {
 		service_worker: "background.js",
 	},
+	web_accessible_resources: [
+		{
+			resources: ["icon/ygeeker.png"],
+			matches: ["<all_urls>"],
+		},
+	],
 	action: {
 		default_icon: {
 			16: "./icon/android-icon-36x36.png",
