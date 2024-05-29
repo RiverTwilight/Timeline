@@ -17,6 +17,7 @@ const _root = "https://twitter.com";
 
 function processTweets() {
 	let tweets = document.querySelectorAll("[data-testid=cellInnerDiv]");
+	console.log("Tweets Captured", tweets.length);
 
 	tweets.forEach((tweet) => {
 		if (isElementInViewport(tweet)) {
@@ -30,7 +31,29 @@ function processTweets() {
 			let tweetImgElems = tweet.querySelectorAll("img[alt='Image']");
 			let showMoreLink;
 
-			if (userNameElem && userIdElem && tweetUrlElem && tweetTimeElem) {
+			let tweetUrl = "";
+			let engaged = false;
+			if (!tweetUrlElem) {
+				// maybe can use the index?
+				// Try to get url from current host
+				if (tweetBodyElem && tweetBodyElem.textContent) {
+					console.log("try to get url from title");
+					const title = document.title;
+					let tweetBody = tweetBodyElem.textContent;
+					const firstFiveChars = tweetBody.substring(0, Math.min(5, tweetBody.length));
+					if (title.includes(firstFiveChars)) {
+						tweetUrl = window.location.href;
+						engaged = true;
+					}
+				}
+			} else {
+				tweetUrl = _root + tweetUrlElem.getAttribute("href");
+			}
+
+			console.log("before checking", userNameElem, tweetBodyElem);
+			if (userNameElem && userIdElem && tweetUrl && tweetTimeElem) {
+				console.log("pass checking", tweetBodyElem.textContent);
+
 				if (tweetBodyElem) {
 					showMoreLink = tweetBodyElem.querySelector(
 						"[data-testid=tweet-text-show-more-link]"
@@ -46,11 +69,12 @@ function processTweets() {
 				}
 
 				let userId = userIdElem.href.split("/").pop();
-				let tweetUrl = _root + tweetUrlElem.getAttribute("href");
 				let tweetTime = tweetTimeElem.getAttribute("datetime");
 				let tweetImages = Array.from(tweetImgElems).map((ele) =>
 					ele.getAttribute("src")
 				);
+
+				console.log("save tweet", tweetBodyElem.textContent);
 
 				saveTweet(
 					userName,
@@ -58,7 +82,8 @@ function processTweets() {
 					userId,
 					tweetUrl,
 					tweetTime,
-					tweetImages
+					tweetImages,
+					engaged
 				);
 			}
 		}
@@ -71,18 +96,20 @@ function isElementInViewport(el) {
 		rect.top >= 0 &&
 		rect.left >= 0 &&
 		rect.bottom <=
-			(window.innerHeight || document.documentElement.clientHeight) &&
+		(window.innerHeight || document.documentElement.clientHeight) &&
 		rect.right <=
-			(window.innerWidth || document.documentElement.clientWidth)
+		(window.innerWidth || document.documentElement.clientWidth)
 	);
 }
+
 function saveTweet(
 	userName,
 	tweetBody,
 	userId,
 	tweetUrl,
 	tweetTime,
-	tweetImages
+	tweetImages,
+	engaged
 ) {
 	console.log("saving tweet");
 
@@ -96,6 +123,7 @@ function saveTweet(
 			tweetTime: tweetTime,
 			tweetImages: tweetImages,
 			captureDate: new Date().toISOString(),
+			engaged: engaged,
 		};
 
 		if (!tweets.some((t) => t.tweetUrl === tweetUrl)) {
@@ -126,6 +154,7 @@ function main() {
 	}
 
 	window.onload = function () {
+		setInterval(processTweets, 500);
 		const targetNode = document.querySelector("#react-root");
 
 		if (targetNode) {
