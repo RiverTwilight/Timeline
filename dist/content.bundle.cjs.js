@@ -1,7 +1,7 @@
 'use strict';
 
 const _maxSaveNumber = 100;
-const _root = "https://twitter.com";
+const _root = "https://x.com";
 // const _primaryContainer = document.querySelector("[data-testid=primaryColumn]");
 
 // function addMenu(tweetEle) {
@@ -18,7 +18,6 @@ const _root = "https://twitter.com";
 
 function processTweets() {
   let tweets = document.querySelectorAll("[data-testid=cellInnerDiv]");
-  console.log("Tweets Captured", tweets.length);
   tweets.forEach(tweet => {
     if (isElementInViewport(tweet)) {
       let userNameElem = tweet.querySelector("[data-testid=User-Name]");
@@ -28,29 +27,20 @@ function processTweets() {
       let tweetTimeElem = tweet.querySelector("a[role='link'] time");
       let tweetImgElems = tweet.querySelectorAll("img[alt='Image']");
       let showMoreLink;
-      let tweetUrl = "";
-      let engaged = false;
-      if (!tweetUrlElem) {
-        // maybe can use the index?
-        // Try to get url from current host
-        if (tweetBodyElem && tweetBodyElem.textContent) {
-          console.log("try to get url from title");
-          const title = document.title;
-          let tweetBody = tweetBodyElem.textContent;
-          const firstFiveChars = tweetBody.substring(0, Math.min(5, tweetBody.length));
-          if (title.includes(firstFiveChars)) {
-            tweetUrl = window.location.href;
-            engaged = true;
-          }
-        }
-      } else {
-        tweetUrl = _root + tweetUrlElem.getAttribute("href");
-      }
-      console.log("before checking", userNameElem, tweetBodyElem);
-      if (userNameElem && userIdElem && tweetUrl && tweetTimeElem) {
-        console.log("pass checking", tweetBodyElem.textContent);
+      if (userNameElem && userIdElem && tweetTimeElem) {
         if (tweetBodyElem) {
           showMoreLink = tweetBodyElem.querySelector("[data-testid=tweet-text-show-more-link]");
+        }
+        let tweetUrl = "";
+        let engaged = false;
+        if (!tweetUrlElem && window.location.pathname.includes("/status/")) {
+          // If the url element is missing, it means
+          // the user might enter the x page from a
+          // external link, instead of home page
+          tweetUrl = window.location.href;
+          engaged = true;
+        } else {
+          tweetUrl = _root + tweetUrlElem.getAttribute("href");
         }
         let userName = userNameElem.textContent;
         let tweetBody = tweetBodyElem.textContent;
@@ -70,11 +60,11 @@ function isElementInViewport(el) {
   const rect = el.getBoundingClientRect();
   return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
 }
+let tweetsToSave = [];
 function saveTweet(userName, tweetBody, userId, tweetUrl, tweetTime, tweetImages, engaged) {
-  console.log("saving tweet");
-  chrome.storage.local.get("tweets", function (data) {
-    let tweets = data.tweets || [];
-    let tweet = {
+  const existingIndex = tweetsToSave.findIndex(tweet => tweet.tweetUrl === tweetUrl);
+  if (existingIndex === -1) {
+    tweetsToSave.push({
       userName: userName,
       tweetBody: tweetBody,
       userId: userId,
@@ -83,33 +73,55 @@ function saveTweet(userName, tweetBody, userId, tweetUrl, tweetTime, tweetImages
       tweetImages: tweetImages,
       captureDate: new Date().toISOString(),
       engaged: engaged
-    };
-    if (!tweets.some(t => t.tweetUrl === tweetUrl)) {
-      if (tweets.length >= _maxSaveNumber) {
-        tweets.shift();
+    });
+  }
+}
+function flushTweets() {
+  chrome.storage.local.get("tweets", function (data) {
+    let tweets = data.tweets || [];
+
+    // Merge tweets in the temporary array with existing tweets in Chrome storage
+    tweetsToSave.forEach(tweetToSave => {
+      const existingTweetIndex = tweets.findIndex(t => t.tweetUrl === tweetToSave.tweetUrl);
+      if (existingTweetIndex !== -1) {
+        // Merge the latest data with the existing tweet
+        // But this may only happen when enaged changed
+        if (tweetToSave.engaged) {
+          tweets[existingTweetIndex].engaged = true;
+        }
+      } else {
+        // Add the new tweet to the existing tweets array
+        if (tweets.length >= _maxSaveNumber) {
+          tweets.shift();
+        }
+        tweets.push(tweetToSave);
       }
-      // push the new tweet
-      tweets.push(tweet);
-    }
+    });
     chrome.storage.local.set({
       tweets: tweets
     });
+    tweetsToSave = [];
   });
 }
 function main() {
   {
     let lastScrollTop = 0;
+    let firstRun = true;
     window.addEventListener("scroll", function () {
       let scrollTop = window.scrollY || document.documentElement.scrollTop;
       if (Math.abs(scrollTop - lastScrollTop) > 300) {
         lastScrollTop = scrollTop;
         processTweets();
       }
+      if (firstRun) {
+        firstRun = false;
+        processTweets();
+      }
     });
   }
   window.onload = function () {
-    setInterval(processTweets, 500);
     const targetNode = document.querySelector("#react-root");
+    setInterval(flushTweets, 5000);
     if (targetNode) {
       const config = {
         attributes: true,
@@ -120,28 +132,34 @@ function main() {
       const callback = function (mutationsList, observer) {
         for (const mutation of mutationsList) {
           if (mutation.type === "childList" && window.location.href !== currentUrl) {
+            console.log("=====>", currentUrl);
             currentUrl = window.location.href;
-            let tweetID = currentUrl.split("/").pop();
-            chrome.storage.local.get("tweets", function (data) {
-              let tweets = data.tweets || [];
+            processTweets();
 
-              // Find the relevant tweet in the storage by its ID
-              let tweetIndex = tweets.findIndex(tweet => tweet.tweetUrl.includes(tweetID));
-              if (tweetIndex !== -1) {
-                // Update the 'engaged' attribute of the tweet
-                tweets[tweetIndex].engaged = true;
+            // let tweetID = currentUrl.split("/").pop();
 
-                // Save the updated tweets array back to the storage
-                chrome.storage.local.set({
-                  tweets: tweets
-                });
-              } else {
-                processTweets();
-              }
-            });
+            // chrome.storage.local.get("tweets", function (data) {
+            // 	let tweets = data.tweets || [];
+
+            // 	// Find the relevant tweet in the storage by its ID
+            // 	let tweetIndex = tweets.findIndex((tweet) =>
+            // 		tweet.tweetUrl.includes(tweetID)
+            // 	);
+
+            // 	if (tweetIndex !== -1) {
+            // 		// Update the 'engaged' attribute of the tweet
+            // 		tweets[tweetIndex].engaged = true;
+
+            // 		// Save the updated tweets array back to the storage
+            // 		chrome.storage.local.set({ tweets: tweets });
+            // 	} else {
+            // 		processTweets();
+            // 	}
+            // });
           }
         }
       };
+
       const observer = new MutationObserver(callback);
       observer.observe(targetNode, config);
     } else {
