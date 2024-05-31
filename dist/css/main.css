@@ -742,6 +742,10 @@ video {
   width: 100%;
 }
 
+.w-52 {
+  width: 13rem;
+}
+
 .min-w-\[500px\] {
   min-width: 500px;
 }
@@ -1051,6 +1055,16 @@ video {
 .hover\:bg-yellow-500:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(234 179 8 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-slate-500:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(100 116 139 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-slate-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(51 65 85 / var(--tw-bg-opacity));
 }
 
 .hover\:text-black:hover {

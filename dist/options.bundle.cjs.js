@@ -4,6 +4,43 @@ var n,l$1,u$1,i$1,o$1,r$1,f$1,c$1={},s$1=[],a$1=/acit|ex(?:s|g|n|p|$)|rph|grid|o
 
 var t,r,u,i,o=0,f=[],c=[],e=l$1.__b,a=l$1.__r,v=l$1.diffed,l=l$1.__c,m=l$1.unmount;function d(t,u){l$1.__h&&l$1.__h(r,t,o||u),o=0;var i=r.__H||(r.__H={__:[],__h:[]});return t>=i.__.length&&i.__.push({__V:c}),i.__[t]}function h(n){return o=1,s(B,n)}function s(n,u,i){var o=d(t++,2);if(o.t=n,!o.__c&&(o.__=[i?i(u):B(void 0,u),function(n){var t=o.__N?o.__N[0]:o.__[0],r=o.t(t,n);t!==r&&(o.__N=[r,o.__[1]],o.__c.setState({}));}],o.__c=r,!r.u)){var f=function(n,t,r){if(!o.__c.__H)return !0;var u=o.__c.__H.__.filter(function(n){return n.__c});if(u.every(function(n){return !n.__N}))return !c||c.call(this,n,t,r);var i=!1;return u.forEach(function(n){if(n.__N){var t=n.__[0];n.__=n.__N,n.__N=void 0,t!==n.__[0]&&(i=!0);}}),!(!i&&o.__c.props===n)&&(!c||c.call(this,n,t,r))};r.u=!0;var c=r.shouldComponentUpdate,e=r.componentWillUpdate;r.componentWillUpdate=function(n,t,r){if(this.__e){var u=c;c=void 0,f(n,t,r),c=u;}e&&e.call(this,n,t,r);},r.shouldComponentUpdate=f;}return o.__N||o.__}function p(u,i){var o=d(t++,3);!l$1.__s&&z(o.__H,i)&&(o.__=u,o.i=i,r.__H.__h.push(o));}function b(){for(var t;t=f.shift();)if(t.__P&&t.__H)try{t.__H.__h.forEach(k),t.__H.__h.forEach(w),t.__H.__h=[];}catch(r){t.__H.__h=[],l$1.__e(r,t.__v);}}l$1.__b=function(n){r=null,e&&e(n);},l$1.__r=function(n){a&&a(n),t=0;var i=(r=n.__c).__H;i&&(u===r?(i.__h=[],r.__h=[],i.__.forEach(function(n){n.__N&&(n.__=n.__N),n.__V=c,n.__N=n.i=void 0;})):(i.__h.forEach(k),i.__h.forEach(w),i.__h=[],t=0)),u=r;},l$1.diffed=function(t){v&&v(t);var o=t.__c;o&&o.__H&&(o.__H.__h.length&&(1!==f.push(o)&&i===l$1.requestAnimationFrame||((i=l$1.requestAnimationFrame)||j)(b)),o.__H.__.forEach(function(n){n.i&&(n.__H=n.i),n.__V!==c&&(n.__=n.__V),n.i=void 0,n.__V=c;})),u=r=null;},l$1.__c=function(t,r){r.some(function(t){try{t.__h.forEach(k),t.__h=t.__h.filter(function(n){return !n.__||w(n)});}catch(u){r.some(function(n){n.__h&&(n.__h=[]);}),r=[],l$1.__e(u,t.__v);}}),l&&l(t,r);},l$1.unmount=function(t){m&&m(t);var r,u=t.__c;u&&u.__H&&(u.__H.__.forEach(function(n){try{k(n);}catch(n){r=n;}}),u.__H=void 0,r&&l$1.__e(r,u.__v));};var g="function"==typeof requestAnimationFrame;function j(n){var t,r=function(){clearTimeout(u),g&&cancelAnimationFrame(t),setTimeout(n);},u=setTimeout(r,100);g&&(t=requestAnimationFrame(r));}function k(n){var t=r,u=n.__c;"function"==typeof u&&(n.__c=void 0,u()),r=t;}function w(n){var t=r;n.__c=n.__(),r=t;}function z(n,t){return !n||n.length!==t.length||t.some(function(t,r){return t!==n[r]})}function B(n,t){return "function"==typeof t?t(n):t}
 
+const Footer = () => y(k$1, null, y("p", {
+  className: "text-gray-500 py-2"
+}, "Chrome has a limit of local storage used by extension. The oldest tweet will automatically replaced by newly added if the limit is reached."), y("div", {
+  className: "mt-8 flex flex-col justify-center items-center"
+}, y("div", {
+  className: "border-slate-400 rounded-full"
+}, y("img", {
+  height: 56,
+  width: 56,
+  src: chrome.runtime.getURL("icon/ygeeker.png")
+})), y("span", {
+  className: "mt-2 text-sm text-slate-400"
+}, "A Work From"), y("div", {
+  className: "text-lg"
+}, y("a", {
+  href: "https://www.ygeeker.com"
+}, "YGeeker")), y("div", {
+  className: "flex mt-2 mb-4 text-slate-500 space-x-1"
+}, y("a", {
+  href: "https://www.ygeeker.com/support/timeline/intro",
+  className: "px-2 hover:underline"
+}, "Help"), y("span", null, "\xB7"), y("a", {
+  href: "https://www.ygeeker.com/support/timeline/legal/term-of-use",
+  className: "px-2 hover:underline"
+}, "Terms"), y("span", null, "\xB7"), y("a", {
+  href: "https://www.ygeeker.com/support/timeline/intro",
+  className: "px-2 hover:underline"
+}, "Feedback"))));
+
+const EmptyHint = () => y("div", {
+  class: "bg-white p-4 rounded-xl flex flex-col justify-center h-56"
+}, y("p", {
+  class: "text-gray-700 mt-1 w-full font-bold text-xl text-center"
+}, "No Record Yet"), y("p", {
+  class: "text-gray-700 w-full text-base text-center"
+}, "Take a look at x.com and check back later"));
+
 function Tweet({
   tweet
 }) {
@@ -72,19 +109,26 @@ function Tweet({
 }
 function toggleBookmark(tweetUrl) {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get("tweets", function (data) {
+    chrome.storage.local.get(["tweets", "bookmarkedTweets"], function (data) {
       let tweets = data.tweets || [];
+      let bookmarkedTweets = data.bookmarkedTweets || [];
       let updated = false;
       for (let tweet of tweets) {
         if (tweet.tweetUrl === tweetUrl) {
           tweet.bookmarked = !tweet.bookmarked; // Toggle the bookmark status
+          if (tweet.bookmarked) {
+            bookmarkedTweets.push(tweet);
+          } else {
+            bookmarkedTweets = bookmarkedTweets.filter(t => t.tweetUrl !== tweetUrl);
+          }
           updated = true;
           break;
         }
       }
       if (updated) {
         chrome.storage.local.set({
-          tweets: tweets
+          tweets: tweets,
+          bookmarkedTweets: bookmarkedTweets
         }, () => {
           if (chrome.runtime.lastError) {
             reject(chrome.runtime.lastError);
@@ -98,22 +142,32 @@ function toggleBookmark(tweetUrl) {
     });
   });
 }
-function deleteTweet(tweetUrl) {
+function deleteTweet(tweetUrl, targets = ["tweets", "bookmarkedTweets"]) {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get("tweets", function (data) {
-      let tweets = data.tweets || [];
+    chrome.storage.local.get(targets, function (data) {
+      let updatedData = {};
       let updated = false;
-      for (let tweetIndex in tweets) {
-        if (tweetUrl === tweets[tweetIndex].tweetUrl) {
-          tweets.splice(tweetIndex, 1);
+      if (targets.includes("tweets")) {
+        let tweets = data.tweets || [];
+        for (let tweetIndex in tweets) {
+          if (tweetUrl === tweets[tweetIndex].tweetUrl) {
+            tweets.splice(tweetIndex, 1);
+            updatedData.tweets = tweets;
+            updated = true;
+            break;
+          }
+        }
+      }
+      if (targets.includes("bookmarkedTweets")) {
+        let bookmarkedTweets = data.bookmarkedTweets || [];
+        bookmarkedTweets = bookmarkedTweets.filter(t => t.tweetUrl !== tweetUrl);
+        if (data.bookmarkedTweets.length !== bookmarkedTweets.length) {
+          updatedData.bookmarkedTweets = bookmarkedTweets;
           updated = true;
-          break;
         }
       }
       if (updated) {
-        chrome.storage.local.set({
-          tweets: tweets
-        }, () => {
+        chrome.storage.local.set(updatedData, () => {
           if (chrome.runtime.lastError) {
             reject(chrome.runtime.lastError);
           } else {
@@ -128,31 +182,34 @@ function deleteTweet(tweetUrl) {
 }
 function searchTweets(searchTerm) {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get("tweets", function (data) {
+    chrome.storage.local.get(["tweets", "bookmarkedTweets"], function (data) {
       let tweets = data.tweets || [];
+      let bookmarkedTweets = data.bookmarkedTweets || [];
       let results = tweets.filter(tweet => tweet.tweetBody.toLowerCase().includes(searchTerm.toLowerCase()));
-      resolve(results);
+      let bookmarkedResults = bookmarkedTweets.filter(tweet => tweet.tweetBody.toLowerCase().includes(searchTerm.toLowerCase()));
+      resolve({
+        results,
+        bookmarkedResults
+      });
     });
   });
 }
-function clearTweets() {
-  chrome.storage.local.remove("tweets", function () {
+function clearTweets(targets) {
+  chrome.storage.local.remove(targets, function () {
     var error = chrome.runtime.lastError;
     if (error) {
       console.error(error);
-    } else {
-      console.log("Tweets cleared successfully");
     }
   });
 }
-function formatDate(isoString) {
-  const date = new Date(isoString);
-  const year = date.getFullYear();
-  const month = ("0" + (date.getMonth() + 1)).slice(-2); // months are zero-indexed in JS
-  const day = ("0" + date.getDate()).slice(-2);
-  const hour = ("0" + date.getHours()).slice(-2);
-  const minute = ("0" + date.getMinutes()).slice(-2);
-  return `${month}/${day}/${year} ${hour}:${minute}`;
+function formatDate(time) {
+  let date = new Date(time);
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit"
+  });
+  return formatter.format(date);
 }
 function exportTweets(tweets) {
   const json = JSON.stringify(tweets);
@@ -189,14 +246,18 @@ function Header({
 }
 function App() {
   const [tweet, setTweet] = h([]);
+  const [bookmarkedPost, setBookmarkedPost] = h([]);
   const [searchTerm, setSearchTerm] = h("");
   const [searchResults, setSearchResults] = h([]);
   const [activeTab, setActiveTab] = h("History");
   const fetchTweets = () => {
-    chrome.storage.local.get("tweets", data => {
+    chrome.storage.local.get(["tweets", "bookmarkedTweets"], data => {
       let fetchedTweets = data.tweets || [];
+      let fetchedBookmarkedTweets = data.bookmarkedTweets || [];
       fetchedTweets.sort((a, b) => new Date(b.captureDate) - new Date(a.captureDate));
+      fetchedBookmarkedTweets.sort((a, b) => new Date(b.captureDate) - new Date(a.captureDate));
       setTweet(fetchedTweets);
+      setBookmarkedPost(fetchedBookmarkedTweets);
     });
   };
 
@@ -209,7 +270,12 @@ function App() {
   p(() => {
     if (searchTerm) {
       searchTweets(searchTerm).then(results => {
-        setSearchResults(results);
+        console.log(results);
+        if (activeTab == "History") {
+          setSearchResults([...results.results]);
+        } else {
+          setSearchResults([...results.bookmarkedResults]);
+        }
       });
     } else {
       setSearchResults([]);
@@ -219,7 +285,7 @@ function App() {
     fetchTweets();
     const handleStorageChange = changes => {
       for (let key in changes) {
-        if (key === "tweets") {
+        if (key === "tweets" || key === "bookmarkedTweets") {
           fetchTweets(); // refetch the tweets
         }
       }
@@ -235,57 +301,32 @@ function App() {
   }), y("div", {
     class: "relative container mx-auto flex"
   }, y("aside", {
-    class: "w-48 sticky pt-5 h-[90vh] px-4 left-0 bottom-0 top-[74px] overflow-hidden"
+    class: "w-52 sticky pt-5 h-[90vh] px-2 left-0 bottom-0 top-[74px] overflow-hidden"
   }, y("nav", null, y("a", {
     onClick: () => setActiveTab("History"),
-    class: `${activeTab == "History" ? "active" : ""} text-lg text-gray-600 cursor-pointer font-semibold block mb-2 py-2 px-4 rounded-md hover:bg-gray-200`
+    class: `${activeTab == "History" ? "active hover:bg-slate-700" : ""} text-lg text-center text-gray-600 cursor-pointer font-semibold block mb-2 py-2 px-4 rounded-md hover:bg-gray-200`
   }, "History"), y("a", {
     onClick: () => setActiveTab("Favorite"),
-    class: `${activeTab == "Favorite" ? "active" : ""} text-lg text-gray-600 cursor-pointer font-semibold block mb-2 py-2 px-4 rounded-md hover:bg-gray-200`
+    class: `${activeTab == "Favorite" ? "active hover:bg-slate-700" : ""} text-lg text-center text-gray-600 cursor-pointer font-semibold block mb-2 py-2 px-4 rounded-md hover:bg-gray-200`
   }, "Favorite"))), y("main", {
     class: "flex-1 px-4 rounded min-w-[550px] overflow-hidden w-full"
-  }, searchTerm.length == 0 && y("section", null, tweet.filter(t => {
+  }, searchTerm.length == 0 && y("section", null, activeTab == "Favorite" ? y("div", null, bookmarkedPost.map(t => {
+    return y(Tweet, {
+      tweet: t
+    });
+  })) : y("div", null, tweet.filter(t => {
     return t.bookmarked && activeTab == "Favorite" || activeTab != "Favorite";
   }).map(t => {
     return y(Tweet, {
       tweet: t
     });
-  }), !!!tweet.length && y("div", {
-    class: "bg-white p-4 rounded-xl flex flex-col justify-center h-56"
-  }, y("p", {
-    class: "text-gray-700 mt-1 w-full font-bold text-xl text-center"
-  }, "No Record Yet"), y("p", {
-    class: "text-gray-700 w-full text-base text-center"
-  }, "Take a look at x.com and check back later")), y("p", {
+  })), !!!tweet.length && activeTab == "History" && y(EmptyHint, {
+    key: "history"
+  }), !!!bookmarkedPost.length && activeTab == "Favorite" && y(EmptyHint, {
+    key: "bookmakred"
+  }), y("p", {
     className: "text-gray-500 py-2"
-  }, "Total: ", tweet.length, "/100"), y("p", {
-    className: "text-gray-500 py-2"
-  }, "Chrome has a limit of local storage used by extension. The oldest tweet will automatically replaced by newly added if the limit is reached."), y("div", {
-    className: "mt-8 flex flex-col justify-center items-center"
-  }, y("div", {
-    className: "border-slate-400 rounded-full"
-  }, y("img", {
-    height: 56,
-    width: 56,
-    src: chrome.runtime.getURL("icon/ygeeker.png")
-  })), y("span", {
-    className: "mt-2 text-sm text-slate-400"
-  }, "A Work From"), y("div", {
-    className: "text-lg"
-  }, y("a", {
-    href: "https://www.ygeeker.com"
-  }, "YGeeker")), y("div", {
-    className: "flex mt-2 mb-4 text-slate-500 space-x-1"
-  }, y("a", {
-    href: "https://www.ygeeker.com/support/timeline/intro",
-    className: "px-2 hover:underline"
-  }, "Help"), y("span", null, "\xB7"), y("a", {
-    href: "https://www.ygeeker.com/support/timeline/legal/term-of-use",
-    className: "px-2 hover:underline"
-  }, "Terms"), y("span", null, "\xB7"), y("a", {
-    href: "https://www.ygeeker.com/support/timeline/intro",
-    className: "px-2 hover:underline"
-  }, "Feedback")))), searchTerm.length > 0 && y("section", null, searchResults.filter(t => {
+  }, "Total: ", tweet.length, "/100"), y(Footer, null)), searchTerm.length > 0 && y("section", null, searchResults.filter(t => {
     return t.bookmarked && activeTab == "Favorite" || activeTab != "Favorite";
   }).map(t => {
     return y(Tweet, {
@@ -337,7 +378,7 @@ function App() {
   }, "Refresh")), y("div", {
     class: "group w-full flex items-center relative"
   }, y("button", {
-    onClick: clearTweets,
+    onClick: () => clearTweets(activeTab == "History" ? ["tweets"] : ["bookmarkedTweets"]),
     class: "bg-white transition-all h-12 w-12 mt-2 bg-red shadow rounded-full flex justify-center items-center overflow-hidden group-hover:w-full group-hover:justify-start",
     id: "clearBtn",
     title: "Clear"

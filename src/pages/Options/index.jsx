@@ -1,5 +1,7 @@
 import { h, Component, render } from "preact";
 import { useState, useEffect } from "preact/hooks";
+import Footer from "../../components/Footer";
+import EmptyHint from "../../components/EmptyHint";
 
 function Tweet({ tweet }) {
 	return (
@@ -65,7 +67,9 @@ function Tweet({ tweet }) {
 					</div>
 				</button>
 				<button
-					onclick={() => deleteTweet(tweet.tweetUrl)}
+					onclick={() =>
+						deleteTweet(tweet.tweetUrl)
+					}
 					class="h-full flex-1 flex flex-col justify-center bg-red-400 hover:bg-red-500"
 				>
 					<div className="flex justify-center w-full">
@@ -90,47 +94,76 @@ function Tweet({ tweet }) {
 
 function toggleBookmark(tweetUrl) {
 	return new Promise((resolve, reject) => {
-		chrome.storage.local.get("tweets", function (data) {
-			let tweets = data.tweets || [];
-			let updated = false;
-			for (let tweet of tweets) {
-				if (tweet.tweetUrl === tweetUrl) {
-					tweet.bookmarked = !tweet.bookmarked; // Toggle the bookmark status
-					updated = true;
-
-					break;
+		chrome.storage.local.get(
+			["tweets", "bookmarkedTweets"],
+			function (data) {
+				let tweets = data.tweets || [];
+				let bookmarkedTweets = data.bookmarkedTweets || [];
+				let updated = false;
+				for (let tweet of tweets) {
+					if (tweet.tweetUrl === tweetUrl) {
+						tweet.bookmarked = !tweet.bookmarked; // Toggle the bookmark status
+						if (tweet.bookmarked) {
+							bookmarkedTweets.push(tweet);
+						} else {
+							bookmarkedTweets = bookmarkedTweets.filter(
+								(t) => t.tweetUrl !== tweetUrl
+							);
+						}
+						updated = true;
+						break;
+					}
+				}
+				if (updated) {
+					chrome.storage.local.set(
+						{ tweets: tweets, bookmarkedTweets: bookmarkedTweets },
+						() => {
+							if (chrome.runtime.lastError) {
+								reject(chrome.runtime.lastError);
+							} else {
+								resolve();
+							}
+						}
+					);
+				} else {
+					resolve();
 				}
 			}
-			if (updated) {
-				chrome.storage.local.set({ tweets: tweets }, () => {
-					if (chrome.runtime.lastError) {
-						reject(chrome.runtime.lastError);
-					} else {
-						resolve();
-					}
-				});
-			} else {
-				resolve();
-			}
-		});
+		);
 	});
 }
 
-function deleteTweet(tweetUrl) {
+function deleteTweet(tweetUrl, targets = ["tweets", "bookmarkedTweets"]) {
 	return new Promise((resolve, reject) => {
-		chrome.storage.local.get("tweets", function (data) {
-			let tweets = data.tweets || [];
+		chrome.storage.local.get(targets, function (data) {
+			let updatedData = {};
 			let updated = false;
-			for (let tweetIndex in tweets) {
-				if (tweetUrl === tweets[tweetIndex].tweetUrl) {
-					tweets.splice(tweetIndex, 1);
-					updated = true;
 
-					break;
+			if (targets.includes("tweets")) {
+				let tweets = data.tweets || [];
+				for (let tweetIndex in tweets) {
+					if (tweetUrl === tweets[tweetIndex].tweetUrl) {
+						tweets.splice(tweetIndex, 1);
+						updatedData.tweets = tweets;
+						updated = true;
+						break;
+					}
 				}
 			}
+
+			if (targets.includes("bookmarkedTweets")) {
+				let bookmarkedTweets = data.bookmarkedTweets || [];
+				bookmarkedTweets = bookmarkedTweets.filter(
+					(t) => t.tweetUrl !== tweetUrl
+				);
+				if (data.bookmarkedTweets.length !== bookmarkedTweets.length) {
+					updatedData.bookmarkedTweets = bookmarkedTweets;
+					updated = true;
+				}
+			}
+
 			if (updated) {
-				chrome.storage.local.set({ tweets: tweets }, () => {
+				chrome.storage.local.set(updatedData, () => {
 					if (chrome.runtime.lastError) {
 						reject(chrome.runtime.lastError);
 					} else {
@@ -146,37 +179,44 @@ function deleteTweet(tweetUrl) {
 
 function searchTweets(searchTerm) {
 	return new Promise((resolve, reject) => {
-		chrome.storage.local.get("tweets", function (data) {
-			let tweets = data.tweets || [];
-			let results = tweets.filter((tweet) =>
-				tweet.tweetBody.toLowerCase().includes(searchTerm.toLowerCase())
-			);
-			resolve(results);
-		});
+		chrome.storage.local.get(
+			["tweets", "bookmarkedTweets"],
+			function (data) {
+				let tweets = data.tweets || [];
+				let bookmarkedTweets = data.bookmarkedTweets || [];
+				let results = tweets.filter((tweet) =>
+					tweet.tweetBody
+						.toLowerCase()
+						.includes(searchTerm.toLowerCase())
+				);
+				let bookmarkedResults = bookmarkedTweets.filter((tweet) =>
+					tweet.tweetBody
+						.toLowerCase()
+						.includes(searchTerm.toLowerCase())
+				);
+				resolve({ results, bookmarkedResults });
+			}
+		);
 	});
 }
 
-function clearTweets() {
-	chrome.storage.local.remove("tweets", function () {
+function clearTweets(targets) {
+	chrome.storage.local.remove(targets, function () {
 		var error = chrome.runtime.lastError;
 		if (error) {
 			console.error(error);
-		} else {
-			console.log("Tweets cleared successfully");
 		}
 	});
 }
 
-function formatDate(isoString) {
-	const date = new Date(isoString);
-
-	const year = date.getFullYear();
-	const month = ("0" + (date.getMonth() + 1)).slice(-2); // months are zero-indexed in JS
-	const day = ("0" + date.getDate()).slice(-2);
-	const hour = ("0" + date.getHours()).slice(-2);
-	const minute = ("0" + date.getMinutes()).slice(-2);
-
-	return `${month}/${day}/${year} ${hour}:${minute}`;
+function formatDate(time) {
+	let date = new Date(time);
+	const formatter = new Intl.DateTimeFormat("en-US", {
+		year: "numeric",
+		month: "short",
+		day: "2-digit",
+	});
+	return formatter.format(date);
 }
 
 function exportTweets(tweets) {
@@ -222,17 +262,27 @@ function Header({ tweets }) {
 
 function App() {
 	const [tweet, setTweet] = useState([]);
+	const [bookmarkedPost, setBookmarkedPost] = useState([]);
+
 	const [searchTerm, setSearchTerm] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
 	const [activeTab, setActiveTab] = useState("History");
 
 	const fetchTweets = () => {
-		chrome.storage.local.get("tweets", (data) => {
+		chrome.storage.local.get(["tweets", "bookmarkedTweets"], (data) => {
 			let fetchedTweets = data.tweets || [];
+			let fetchedBookmarkedTweets = data.bookmarkedTweets || [];
+
 			fetchedTweets.sort(
 				(a, b) => new Date(b.captureDate) - new Date(a.captureDate)
 			);
+
+			fetchedBookmarkedTweets.sort(
+				(a, b) => new Date(b.captureDate) - new Date(a.captureDate)
+			);
+
 			setTweet(fetchedTweets);
+			setBookmarkedPost(fetchedBookmarkedTweets);
 		});
 	};
 
@@ -245,7 +295,12 @@ function App() {
 	useEffect(() => {
 		if (searchTerm) {
 			searchTweets(searchTerm).then((results) => {
-				setSearchResults(results);
+				console.log(results);
+				if (activeTab == "History") {
+					setSearchResults([...results.results]);
+				} else {
+					setSearchResults([...results.bookmarkedResults]);
+				}
 			});
 		} else {
 			setSearchResults([]);
@@ -257,7 +312,7 @@ function App() {
 
 		const handleStorageChange = (changes) => {
 			for (let key in changes) {
-				if (key === "tweets") {
+				if (key === "tweets" || key === "bookmarkedTweets") {
 					fetchTweets(); // refetch the tweets
 				}
 			}
@@ -273,21 +328,25 @@ function App() {
 		<div class="relative min-w-[500px] max-w-[800px]">
 			<Header tweets={tweet} />
 			<div class="relative container mx-auto flex">
-				<aside class="w-48 sticky pt-5 h-[90vh] px-4 left-0 bottom-0 top-[74px] overflow-hidden">
+				<aside class="w-52 sticky pt-5 h-[90vh] px-2 left-0 bottom-0 top-[74px] overflow-hidden">
 					<nav>
 						<a
 							onClick={() => setActiveTab("History")}
 							class={`${
-								activeTab == "History" ? "active" : ""
-							} text-lg text-gray-600 cursor-pointer font-semibold block mb-2 py-2 px-4 rounded-md hover:bg-gray-200`}
+								activeTab == "History"
+									? "active hover:bg-slate-700"
+									: ""
+							} text-lg text-center text-gray-600 cursor-pointer font-semibold block mb-2 py-2 px-4 rounded-md hover:bg-gray-200`}
 						>
 							History
 						</a>
 						<a
 							onClick={() => setActiveTab("Favorite")}
 							class={`${
-								activeTab == "Favorite" ? "active" : ""
-							} text-lg text-gray-600 cursor-pointer font-semibold block mb-2 py-2 px-4 rounded-md hover:bg-gray-200`}
+								activeTab == "Favorite"
+									? "active hover:bg-slate-700"
+									: ""
+							} text-lg text-center text-gray-600 cursor-pointer font-semibold block mb-2 py-2 px-4 rounded-md hover:bg-gray-200`}
 						>
 							Favorite
 						</a>
@@ -304,76 +363,38 @@ function App() {
 				<main class="flex-1 px-4 rounded min-w-[550px] overflow-hidden w-full">
 					{searchTerm.length == 0 && (
 						<section>
-							{tweet
-								.filter((t) => {
-									return (
-										(t.bookmarked &&
-											activeTab == "Favorite") ||
-										activeTab != "Favorite"
-									);
-								})
-								.map((t) => {
-									return <Tweet tweet={t} />;
-								})}
-							{!!!tweet.length && (
-								<div class="bg-white p-4 rounded-xl flex flex-col justify-center h-56">
-									<p class="text-gray-700 mt-1 w-full font-bold text-xl text-center">
-										No Record Yet
-									</p>
-									<p class="text-gray-700 w-full text-base text-center">
-										Take a look at x.com and check back later
-									</p>
+							{activeTab == "Favorite" ? (
+								<div>
+									{bookmarkedPost.map((t) => {
+										return <Tweet tweet={t} />;
+									})}
+								</div>
+							) : (
+								<div>
+									{tweet
+										.filter((t) => {
+											return (
+												(t.bookmarked &&
+													activeTab == "Favorite") ||
+												activeTab != "Favorite"
+											);
+										})
+										.map((t) => {
+											return <Tweet tweet={t} />;
+										})}
 								</div>
 							)}
+							{!!!tweet.length && activeTab == "History" && (
+								<EmptyHint key="history" />
+							)}
+							{!!!bookmarkedPost.length &&
+								activeTab == "Favorite" && (
+									<EmptyHint key="bookmakred" />
+								)}
 							<p className="text-gray-500 py-2">
 								Total: {tweet.length}/100
 							</p>
-							<p className="text-gray-500 py-2">
-								Chrome has a limit of local storage used by
-								extension. The oldest tweet will automatically
-								replaced by newly added if the limit is reached.
-							</p>
-							<div className="mt-8 flex flex-col justify-center items-center">
-								<div className="border-slate-400 rounded-full">
-									<img
-										height={56}
-										width={56}
-										src={chrome.runtime.getURL(
-											"icon/ygeeker.png"
-										)}
-									></img>
-								</div>
-								<span className="mt-2 text-sm text-slate-400">
-									A Work From
-								</span>
-								<div className="text-lg">
-									<a href="https://www.ygeeker.com">
-										YGeeker
-									</a>
-								</div>
-								<div className="flex mt-2 mb-4 text-slate-500 space-x-1">
-									<a
-										href="https://www.ygeeker.com/support/timeline/intro"
-										className="px-2 hover:underline"
-									>
-										Help
-									</a>
-									<span>·</span>
-									<a
-										href="https://www.ygeeker.com/support/timeline/legal/term-of-use"
-										className="px-2 hover:underline"
-									>
-										Terms
-									</a>
-									<span>·</span>
-									<a
-										href="https://www.ygeeker.com/support/timeline/intro"
-										className="px-2 hover:underline"
-									>
-										Feedback
-									</a>
-								</div>
-							</div>
+							<Footer />
 						</section>
 					)}
 					{searchTerm.length > 0 && (
@@ -444,7 +465,13 @@ function App() {
 					</div>
 					<div class="group w-full flex items-center relative">
 						<button
-							onClick={clearTweets}
+							onClick={() =>
+								clearTweets(
+									activeTab == "History"
+										? ["tweets"]
+										: ["bookmarkedTweets"]
+								)
+							}
 							class="bg-white transition-all h-12 w-12 mt-2 bg-red shadow rounded-full flex justify-center items-center overflow-hidden group-hover:w-full group-hover:justify-start"
 							id="clearBtn"
 							title="Clear"
